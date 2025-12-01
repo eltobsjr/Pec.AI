@@ -21,7 +21,7 @@ export default function CameraCapture({ onImageCaptured, capturedImage }: Camera
     const getCameraPermission = async () => {
       if (hasCameraPermission === null) {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
           setHasCameraPermission(true);
 
           if (videoRef.current) {
