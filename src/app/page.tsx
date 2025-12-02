@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/pec-ai/Header';
 import CardLibrary from '@/components/pec-ai/CardLibrary';
 import PhraseBuilder from '@/components/pec-ai/PhraseBuilder';
@@ -18,6 +19,14 @@ export default function Home() {
   const [isLoadingCards, setIsLoadingCards] = useState(true);
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
+
+  // Redirecionar para login se não estiver autenticado
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
 
   // Carregar cartões do Supabase
   useEffect(() => {
