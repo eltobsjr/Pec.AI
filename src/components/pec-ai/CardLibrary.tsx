@@ -28,9 +28,7 @@ export default function CardLibrary({
 }: CardLibraryProps) {
 
   const addCardToLibrary = (newCardData: Omit<PecCardType, 'id'>) => {
-    const newCard = { ...newCardData, id: Date.now().toString() };
-    // This is a bit of a hack, we should lift the state up
-    // for now, we just reload the page to see the new card
+    // Recarregar a página para buscar novos dados
     window.location.reload();
   };
 

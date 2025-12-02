@@ -68,23 +68,48 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
     setIsLoading(true);
 
     try {
+      // 1. Identificar objeto e gerar cartão com IA
       const result = await identifyObjectAndGenerateCard({ photoDataUri: imageSource });
-      onCardGenerated({
+      
+      // 2. Fazer upload das imagens para Supabase Storage
+      const { uploadImage } = await import('@/lib/services/storage');
+      
+      // Upload da imagem original
+      const originalImageUrl = await uploadImage(
+        imageSource,
+        'original-images'
+      );
+      
+      // Upload do cartão processado
+      const cardImageUrl = await uploadImage(
+        result.cardDataUri,
+        'pec-cards'
+      );
+
+      // 3. Criar registro no banco de dados
+      const { createCard } = await import('@/lib/services/cards');
+      await createCard({
         name: result.objectName,
         category: result.category,
-        imageSrc: result.cardDataUri,
+        image_url: cardImageUrl,
+        original_image_url: originalImageUrl,
       });
+
       toast({
         title: 'Sucesso!',
         description: `Cartão "${result.objectName}" criado e adicionado à biblioteca.`,
         className: 'bg-green-100 border-green-300 text-green-800'
       });
+      
       resetAndClose();
+      
+      // Recarregar a página para atualizar a lista de cartões
+      window.location.reload();
     } catch (error) {
       console.error('Error generating card:', error);
       toast({
-        title: 'Erro de IA',
-        description: 'Não foi possível gerar o cartão. Tente outra imagem ou uma com melhor qualidade.',
+        title: 'Erro',
+        description: 'Não foi possível gerar o cartão. Tente novamente.',
         variant: 'destructive',
       });
     } finally {

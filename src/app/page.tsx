@@ -6,34 +6,49 @@ import CardLibrary from '@/components/pec-ai/CardLibrary';
 import PhraseBuilder from '@/components/pec-ai/PhraseBuilder';
 import type { PecCard, PhraseItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { getCards, deleteCard } from '@/lib/services/cards';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Home() {
   const [cards, setCards] = useState<PecCard[]>([]);
   const [phraseItems, setPhraseItems] = useState<PhraseItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [isLoadingCards, setIsLoadingCards] = useState(true);
+  const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
 
+  // Carregar cartões do Supabase
   useEffect(() => {
-    setIsMounted(true);
-    try {
-      const savedCards = localStorage.getItem('pec-ai-cards');
-      if (savedCards) {
-        setCards(JSON.parse(savedCards));
+    const loadCards = async () => {
+      if (authLoading) return;
+      
+      if (!user) {
+        setIsLoadingCards(false);
+        setIsMounted(true);
+        return;
       }
-    } catch (error) {
-      console.error('Failed to load cards from localStorage', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isMounted) {
+      
       try {
-        localStorage.setItem('pec-ai-cards', JSON.stringify(cards));
+        setIsLoadingCards(true);
+        const fetchedCards = await getCards();
+        setCards(fetchedCards);
       } catch (error) {
-        console.error('Failed to save cards to localStorage', error);
+        console.error('Erro ao carregar cartões:', error);
+        toast({
+          title: 'Erro',
+          description: 'Não foi possível carregar seus cartões.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoadingCards(false);
+        setIsMounted(true);
       }
-    }
-  }, [cards, isMounted]);
+    };
+
+    loadCards();
+  }, [user, authLoading, toast]);
 
   const categories = useMemo(() => {
     const allCategories = cards.map((card) => card.category);
@@ -47,9 +62,14 @@ export default function Home() {
     return cards.filter((card) => card.category === activeCategory);
   }, [cards, activeCategory]);
 
-  const addCardToLibrary = (newCardData: Omit<PecCard, 'id'>) => {
-    const newCard = { ...newCardData, id: Date.now().toString() };
-    setCards((prev) => [newCard, ...prev]);
+  const addCardToLibrary = async (newCardData: Omit<PecCard, 'id'>) => {
+    // Recarregar cartões do servidor
+    try {
+      const fetchedCards = await getCards();
+      setCards(fetchedCards);
+    } catch (error) {
+      console.error('Erro ao recarregar cartões:', error);
+    }
   };
 
   const addItemToPhrase = (item: Omit<PhraseItem, 'id'>) => {
@@ -82,17 +102,31 @@ export default function Home() {
     setPhraseItems([]);
   };
 
-  const deleteCardFromLibrary = (cardId: string) => {
-    setCards((prev) => prev.filter((c) => c.id !== cardId));
-    setPhraseItems((prev) => prev.filter((item) => {
-      if (item.type === 'card') {
-        return item.data.id !== cardId;
-      }
-      return true;
-    }));
+  const deleteCardFromLibrary = async (cardId: string) => {
+    try {
+      await deleteCard(cardId);
+      setCards((prev) => prev.filter((c) => c.id !== cardId));
+      setPhraseItems((prev) => prev.filter((item) => {
+        if (item.type === 'card') {
+          return item.data.id !== cardId;
+        }
+        return true;
+      }));
+      toast({
+        title: 'Sucesso',
+        description: 'Cartão removido da biblioteca.',
+      });
+    } catch (error) {
+      console.error('Erro ao deletar cartão:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível deletar o cartão.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  if (!isMounted) {
+  if (authLoading || !isMounted) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Header />
