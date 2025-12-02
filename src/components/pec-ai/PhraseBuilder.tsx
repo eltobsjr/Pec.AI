@@ -25,12 +25,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 
 const availableVoices = [
-    { id: 'Algenib', name: 'Voz Masculina 1 (Padrão)', gender: 'Masculino' },
-    { id: 'Achernar', name: 'Voz Masculina 2', gender: 'Masculino' },
-    { id: 'Elnath', name: 'Voz Masculina 3', gender: 'Masculino' },
-    { id: 'Cursa', name: 'Voz Feminina 1', gender: 'Feminino' },
-    { id: 'Deneb', name: 'Voz Feminina 2', gender: 'Feminino' },
-    { id: 'Fomalhaut', name: 'Voz Feminina 3', gender: 'Feminino' },
+    { id: 'algenib', name: 'Voz Masculina 1 (Padrão)', gender: 'Masculino' },
+    { id: 'achernar', name: 'Voz Masculina 2', gender: 'Masculino' },
+    { id: 'gacrux', name: 'Voz Masculina 3', gender: 'Masculino' },
+    { id: 'autonoe', name: 'Voz Feminina 1', gender: 'Feminino' },
+    { id: 'callirrhoe', name: 'Voz Feminina 2', gender: 'Feminino' },
+    { id: 'laomedeia', name: 'Voz Feminina 3', gender: 'Feminino' },
 ] as const;
 
 type VoiceId = typeof availableVoices[number]['id'];
@@ -129,7 +129,7 @@ export default function PhraseBuilder({ items, onAddItem, onRemoveItem, onClear,
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [textInput, setTextInput] = useState('');
-  const [selectedVoice, setSelectedVoice] = useState<VoiceId>('Algenib');
+  const [selectedVoice, setSelectedVoice] = useState<VoiceId>('algenib');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
@@ -200,7 +200,7 @@ export default function PhraseBuilder({ items, onAddItem, onRemoveItem, onClear,
       
       if(audioRef.current) {
         audioRef.current.src = audioDataUri;
-        audioRef.current.play();
+        await audioRef.current.play();
       }
 
     } catch (error) {
@@ -217,9 +217,9 @@ export default function PhraseBuilder({ items, onAddItem, onRemoveItem, onClear,
   useEffect(() => {
     const audioEl = new Audio();
     audioEl.onended = () => setIsSpeaking(false);
-    audioEl.onerror = () => {
+    audioEl.onerror = (e) => {
         setIsSpeaking(false);
-        console.error("Error playing audio");
+        console.error("Error playing audio", (e.target as HTMLAudioElement).error);
     };
     audioRef.current = audioEl;
 
