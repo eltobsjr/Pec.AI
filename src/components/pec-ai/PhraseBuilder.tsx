@@ -3,7 +3,7 @@
 import type { PecCard, PhraseItem } from '@/lib/types';
 import PecCardComponent from './PecCard';
 import { Button } from '@/components/ui/button';
-import { Volume2, XCircle, Loader2, MessageSquarePlus, X } from 'lucide-react';
+import { Volume2, XCircle, Loader2, MessageSquarePlus, X, Settings } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { useToast } from '@/hooks/use-toast';
@@ -11,7 +11,29 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
+
+const availableVoices = [
+    { id: 'Algenib', name: 'Voz Masculina 1 (Padrão)', gender: 'Masculino' },
+    { id: 'Achernar', name: 'Voz Masculina 2', gender: 'Masculino' },
+    { id: 'Elnath', name: 'Voz Masculina 3', gender: 'Masculino' },
+    { id: 'Cursa', name: 'Voz Feminina 1', gender: 'Feminino' },
+    { id: 'Deneb', name: 'Voz Feminina 2', gender: 'Feminino' },
+    { id: 'Fomalhaut', name: 'Voz Feminina 3', gender: 'Feminino' },
+] as const;
+
+type VoiceId = typeof availableVoices[number]['id'];
 
 type TextCardProps = {
   item: PhraseItem & { type: 'text' };
@@ -107,8 +129,31 @@ export default function PhraseBuilder({ items, onAddItem, onRemoveItem, onClear,
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [textInput, setTextInput] = useState('');
+  const [selectedVoice, setSelectedVoice] = useState<VoiceId>('Algenib');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    try {
+      const savedVoice = localStorage.getItem('pec-ai-voice');
+      if (savedVoice && availableVoices.some(v => v.id === savedVoice)) {
+        setSelectedVoice(savedVoice as VoiceId);
+      }
+    } catch (error) {
+      console.error('Failed to load voice from localStorage', error);
+    }
+  }, []);
+
+  const handleVoiceChange = (voiceId: VoiceId) => {
+    setSelectedVoice(voiceId);
+    try {
+      localStorage.setItem('pec-ai-voice', voiceId);
+    } catch (error) {
+      console.error('Failed to save voice to localStorage', error);
+    }
+  };
+
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -151,7 +196,7 @@ export default function PhraseBuilder({ items, onAddItem, onRemoveItem, onClear,
 
     setIsSpeaking(true);
     try {
-      const { audioDataUri } = await textToSpeech({ text: phraseText });
+      const { audioDataUri } = await textToSpeech({ text: phraseText, voiceName: selectedVoice });
       
       if(audioRef.current) {
         audioRef.current.src = audioDataUri;
@@ -229,6 +274,36 @@ export default function PhraseBuilder({ items, onAddItem, onRemoveItem, onClear,
             <XCircle className="mr-2 h-4 w-4" />
             Limpar
           </Button>
+            <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline" size="icon">
+                        <Settings className="h-4 w-4" />
+                        <span className="sr-only">Configurações</span>
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Configurações de Voz</DialogTitle>
+                        <DialogDescription>
+                            Escolha a voz que será usada para falar as frases.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <RadioGroup defaultValue={selectedVoice} onValueChange={(value) => handleVoiceChange(value as VoiceId)} className="grid gap-4 py-4">
+                        {availableVoices.map((voice) => (
+                            <div key={voice.id} className="flex items-center space-x-3 rounded-md border p-3 hover:bg-muted/50 transition-colors">
+                                <RadioGroupItem value={voice.id} id={voice.id} />
+                                <Label htmlFor={voice.id} className="flex-1 cursor-pointer">
+                                    <span className="font-semibold">{voice.name}</span>
+                                    <p className="text-xs text-muted-foreground">{voice.gender}</p>
+                                </Label>
+                            </div>
+                        ))}
+                    </RadioGroup>
+                    <DialogFooter>
+                      <Button onClick={() => setIsSettingsOpen(false)}>Fechar</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
       </div>
       <div className="flex items-stretch gap-4 min-h-[180px] w-full overflow-x-auto p-4 rounded-lg bg-muted/50 border-2 border-dashed">
