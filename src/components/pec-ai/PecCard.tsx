@@ -21,6 +21,7 @@ interface PecCardProps {
   onRemoveFromPhrase?: (id: string) => void;
   onReorderInPhrase?: (draggedId: string, targetId: string) => void;
   onAddToPhrase?: (card: PecCardType) => void;
+  idInPhrase?: string;
 }
 
 export default function PecCard({
@@ -30,11 +31,16 @@ export default function PecCard({
   onRemoveFromPhrase,
   onReorderInPhrase,
   onAddToPhrase,
+  idInPhrase
 }: PecCardProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
-    e.dataTransfer.setData('application/pec-ai-card', JSON.stringify(card));
+    e.dataTransfer.setData('application/pec-ai-item', JSON.stringify({
+      type: 'card',
+      id: idInPhrase || card.id,
+      data: card
+    }));
     e.dataTransfer.effectAllowed = 'move';
   };
 
@@ -50,14 +56,14 @@ export default function PecCard({
   };
 
   const handleDrop = (e: React.DragEvent) => {
-    if (location === 'phrase' && onReorderInPhrase) {
+    if (location === 'phrase' && onReorderInPhrase && idInPhrase) {
       e.preventDefault();
       setIsDragOver(false);
       try {
-        const data = e.dataTransfer.getData('application/pec-ai-card');
-        const draggedCard: PecCardType = JSON.parse(data);
-        if (draggedCard && draggedCard.id !== card.id) {
-          onReorderInPhrase(draggedCard.id, card.id);
+        const data = e.dataTransfer.getData('application/pec-ai-item');
+        const draggedItem = JSON.parse(data);
+        if (draggedItem && draggedItem.id !== idInPhrase) {
+          onReorderInPhrase(draggedItem.id, idInPhrase);
         }
       } catch (err) {
         console.error('Drop for reorder failed', err);
@@ -136,7 +142,7 @@ export default function PecCard({
           </Tooltip>
         )}
 
-        {location === 'phrase' && onRemoveFromPhrase && (
+        {location === 'phrase' && onRemoveFromPhrase && idInPhrase && (
            <Tooltip>
                 <TooltipTrigger asChild>
                     <Button
@@ -145,7 +151,7 @@ export default function PecCard({
                         className="absolute -top-3 -right-3 h-7 w-7 rounded-full opacity-0 group-hover/card-wrapper:opacity-100 transition-opacity z-20 bg-background/80 hover:bg-destructive hover:text-destructive-foreground"
                         onClick={(e) => {
                             e.stopPropagation();
-                            onRemoveFromPhrase(card.id);
+                            onRemoveFromPhrase(idInPhrase);
                         }}
                         aria-label={`Remover cartão ${card.name} da frase`}
                     >

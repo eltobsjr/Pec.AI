@@ -2,15 +2,14 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Header from '@/components/pec-ai/Header';
-import ImageUploader from '@/components/pec-ai/ImageUploader';
 import CardLibrary from '@/components/pec-ai/CardLibrary';
 import PhraseBuilder from '@/components/pec-ai/PhraseBuilder';
-import type { PecCard } from '@/lib/types';
+import type { PecCard, PhraseItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
   const [cards, setCards] = useState<PecCard[]>([]);
-  const [phraseCards, setPhraseCards] = useState<PecCard[]>([]);
+  const [phraseItems, setPhraseItems] = useState<PhraseItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
@@ -53,41 +52,44 @@ export default function Home() {
     setCards((prev) => [newCard, ...prev]);
   };
 
+  const addItemToPhrase = (item: Omit<PhraseItem, 'id'>) => {
+    const newItem = { ...item, id: Date.now().toString() };
+    setPhraseItems((prev) => [...prev, newItem]);
+  };
+
   const addCardToPhrase = (card: PecCard) => {
-    setPhraseCards((prev) => [...prev, card]);
+    addItemToPhrase({ type: 'card', data: card });
   };
-
-  const removeCardFromPhrase = (cardId: string) => {
-    setPhraseCards((prev) => {
-      const cardIndex = prev.findIndex(c => c.id === cardId);
-      if (cardIndex > -1) {
-        const newCards = [...prev];
-        newCards.splice(cardIndex, 1);
-        return newCards;
-      }
-      return prev;
-    });
+  
+  const removeItemFromPhrase = (itemId: string) => {
+    setPhraseItems((prev) => prev.filter((item) => item.id !== itemId));
   };
+  
 
-  const reorderPhraseCards = (draggedId: string, targetId: string) => {
-    const dragIndex = phraseCards.findIndex((c) => c.id === draggedId);
-    const targetIndex = phraseCards.findIndex((c) => c.id === targetId);
+  const reorderPhraseItems = (draggedId: string, targetId: string) => {
+    const dragIndex = phraseItems.findIndex((c) => c.id === draggedId);
+    const targetIndex = phraseItems.findIndex((c) => c.id === targetId);
 
     if (dragIndex > -1 && targetIndex > -1) {
-      const newCards = [...phraseCards];
-      const [draggedItem] = newCards.splice(dragIndex, 1);
-      newCards.splice(targetIndex, 0, draggedItem);
-      setPhraseCards(newCards);
+      const newItems = [...phraseItems];
+      const [draggedItem] = newItems.splice(dragIndex, 1);
+      newItems.splice(targetIndex, 0, draggedItem);
+      setPhraseItems(newItems);
     }
   };
 
   const clearPhrase = () => {
-    setPhraseCards([]);
+    setPhraseItems([]);
   };
 
   const deleteCardFromLibrary = (cardId: string) => {
     setCards((prev) => prev.filter((c) => c.id !== cardId));
-    setPhraseCards((prev) => prev.filter((c) => c.id !== cardId));
+    setPhraseItems((prev) => prev.filter((item) => {
+      if (item.type === 'card') {
+        return item.data.id !== cardId;
+      }
+      return true;
+    }));
   };
 
   if (!isMounted) {
@@ -118,11 +120,11 @@ export default function Home() {
       <main className="flex-grow container mx-auto p-4 md:p-6 lg:p-8">
         <div className="grid gap-8">
           <PhraseBuilder
-            cards={phraseCards}
-            onDrop={addCardToPhrase}
-            onRemove={removeCardFromPhrase}
+            items={phraseItems}
+            onAddItem={addItemToPhrase}
+            onRemoveItem={removeItemFromPhrase}
             onClear={clearPhrase}
-            onReorder={reorderPhraseCards}
+            onReorder={reorderPhraseItems}
           />
           <CardLibrary
             cards={filteredCards}
