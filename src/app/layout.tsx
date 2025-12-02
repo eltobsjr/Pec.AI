@@ -1,10 +1,12 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import { GeistSans } from 'geist/font/sans';
 
 export const metadata: Metadata = {
   title: 'PEC.AI',
   description: 'Gere cartões de comunicação PEC com IA',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 };
 
 export default function RootLayout({
@@ -13,14 +15,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased">
-        {children}
+    <html lang="pt-BR" className={GeistSans.className}>
+      <body>
+        <main className="antialiased">{children}</main>
         <Toaster />
       </body>
     </html>

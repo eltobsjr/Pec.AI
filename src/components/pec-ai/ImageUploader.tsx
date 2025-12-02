@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { identifyObjectAndGenerateCard } from '@/ai/flows/identify-object-and-generate-card';
 import { Button } from '@/components/ui/button';
-import { Loader2, PlusCircle, Upload, Camera } from 'lucide-react';
+import { Loader2, Upload, Camera, FileUp } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,40 +12,54 @@ import {
   DialogTitle,
   DialogDescription,
   DialogTrigger,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '../ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import CameraCapture from './CameraCapture';
 import type { PecCard } from '@/lib/types';
+import Image from 'next/image';
 
 type ImageUploaderProps = {
   onCardGenerated: (card: Omit<PecCard, 'id'>) => void;
+  children: ReactNode;
 };
 
-export default function ImageUploader({ onCardGenerated }: ImageUploaderProps) {
+export default function ImageUploader({ onCardGenerated, children }: ImageUploaderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setFile(event.target.files[0]);
+    const currentFile = event.target.files?.[0];
+    if (currentFile) {
+      setFile(currentFile);
       setCapturedImage(null);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFilePreview(reader.result as string);
+      };
+      reader.readAsDataURL(currentFile);
     }
   };
 
   const handleImageCaptured = (imageSrc: string) => {
     setCapturedImage(imageSrc);
     setFile(null);
+    setFilePreview(null);
   };
 
   const handleSubmit = async () => {
-    if (!file && !capturedImage) {
+    const imageSource = capturedImage || filePreview;
+
+    if (!imageSource) {
       toast({
-        title: 'Erro',
-        description: 'Por favor, selecione uma imagem ou capture uma foto.',
+        title: 'Nenhuma Imagem',
+        description: 'Por favor, envie uma imagem ou tire uma foto.',
         variant: 'destructive',
       });
       return;
@@ -53,27 +67,8 @@ export default function ImageUploader({ onCardGenerated }: ImageUploaderProps) {
 
     setIsLoading(true);
 
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => processImage(reader.result as string);
-      reader.onerror = (error) => {
-        console.error('Error reading file:', error);
-        toast({
-          title: 'Erro de Arquivo',
-          description: 'Não foi possível ler o arquivo de imagem.',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-      };
-    } else if (capturedImage) {
-      processImage(capturedImage);
-    }
-  };
-
-  const processImage = async (photoDataUri: string) => {
     try {
-      const result = await identifyObjectAndGenerateCard({ photoDataUri });
+      const result = await identifyObjectAndGenerateCard({ photoDataUri: imageSource });
       onCardGenerated({
         name: result.objectName,
         category: result.category,
@@ -82,56 +77,61 @@ export default function ImageUploader({ onCardGenerated }: ImageUploaderProps) {
       toast({
         title: 'Sucesso!',
         description: `Cartão "${result.objectName}" criado e adicionado à biblioteca.`,
+        className: 'bg-green-100 border-green-300 text-green-800'
       });
-      setOpen(false);
-      setFile(null);
-      setCapturedImage(null);
+      resetAndClose();
     } catch (error) {
       console.error('Error generating card:', error);
       toast({
         title: 'Erro de IA',
-        description: 'Não foi possível gerar o cartão. Tente outra imagem.',
+        description: 'Não foi possível gerar o cartão. Tente outra imagem ou uma com melhor qualidade.',
         variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
-
-  const resetState = () => {
-    if (!open) {
-      setFile(null);
-      setCapturedImage(null);
-    }
+  
+  const resetAndClose = () => {
+    setOpen(false);
+    setFile(null);
+    setFilePreview(null);
+    setCapturedImage(null);
+    setIsLoading(false);
   }
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { setOpen(isOpen); resetState(); }}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) resetAndClose(); else setOpen(true); }}>
       <DialogTrigger asChild>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Novo Cartão
-        </Button>
+        {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Criar Novo Cartão PEC</DialogTitle>
           <DialogDescription>
-            Use IA para criar um cartão de um objeto a partir de uma foto.
+            Use IA para criar um cartão a partir de uma foto de um objeto. A IA irá identificar, remover o fundo e categorizar o objeto para você.
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="upload" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="upload"><Upload className="mr-2 h-4 w-4"/> Enviar Foto</TabsTrigger>
+            <TabsTrigger value="upload"><FileUp className="mr-2 h-4 w-4"/> Enviar Foto</TabsTrigger>
             <TabsTrigger value="camera"><Camera className="mr-2 h-4 w-4"/> Tirar Foto</TabsTrigger>
           </TabsList>
           <TabsContent value="upload">
             <div className="grid gap-4 py-4">
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Input id="picture" type="file" accept="image/*" onChange={handleFileChange} disabled={isLoading} />
-                {file && <p className="text-sm text-muted-foreground">Arquivo: {file.name}</p>}
-              </div>
+                <label htmlFor="picture-upload" className={`relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80 transition-colors ${filePreview ? '' : 'p-5'}`}>
+                    {filePreview ? (
+                        <Image src={filePreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg" />
+                    ) : (
+                        <div className="text-center text-muted-foreground">
+                            <FileUp className="w-10 h-10 mx-auto mb-3" />
+                            <p className="font-semibold">Clique para enviar</p>
+                            <p className="text-xs">PNG, JPG ou WEBP</p>
+                        </div>
+                    )}
+                </label>
+                <Input id="picture-upload" type="file" accept="image/*" onChange={handleFileChange} disabled={isLoading} className="sr-only" />
             </div>
           </TabsContent>
           <TabsContent value="camera">
@@ -139,19 +139,18 @@ export default function ImageUploader({ onCardGenerated }: ImageUploaderProps) {
           </TabsContent>
         </Tabs>
         
-        <Button onClick={handleSubmit} disabled={isLoading || (!file && !capturedImage)}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Gerando...
-            </>
-          ) : (
-            <>
-              <Upload className="mr-2 h-4 w-4" />
-              Gerar Cartão
-            </>
-          )}
-        </Button>
+        <DialogFooter>
+          <Button onClick={handleSubmit} disabled={isLoading || (!filePreview && !capturedImage)}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Gerando Cartão...
+              </>
+            ) : (
+              'Gerar Cartão'
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
