@@ -63,20 +63,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0F8FF] to-[#A0D2EB]/20 p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-[#F0F8FF] to-[#A0D2EB]/20">
+      <div className="container mx-auto px-4 py-6 sm:py-12 flex items-center justify-center min-h-screen">
+        <Card className="w-full max-w-[95vw] sm:max-w-md shadow-2xl">
         <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto mb-4">
+          <div className="mx-auto mb-3 sm:mb-4">
             <Image
               src="/logo.svg"
               alt="PEC.AI Logo"
-              width={120}
-              height={40}
-              className="mx-auto"
+              width={100}
+              height={33}
+              className="mx-auto sm:w-[120px] sm:h-[40px]"
             />
           </div>
-          <CardTitle className="text-3xl font-bold">Bem-vindo</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl sm:text-3xl font-bold">Bem-vindo</CardTitle>
+          <CardDescription className="text-sm sm:text-base">
             Entre com sua conta para acessar o PEC.AI
           </CardDescription>
         </CardHeader>
@@ -162,9 +163,10 @@ export default function LoginPage() {
           </CardFooter>
         </form>
       </Card>
-      <p className="text-center text-sm text-muted-foreground mt-6">
+      <p className="text-center text-xs sm:text-sm text-muted-foreground mt-4">
         Desenvolvido por <strong>Uapps by eltobsjr</strong>
       </p>
+      </div>
     </div>
   );
 }

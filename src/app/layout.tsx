@@ -1,4 +1,5 @@
 import type {Metadata} from 'next';
+// Global CSS import ignmoring linting rules
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { GeistSans } from 'geist/font/sans';
@@ -8,7 +9,7 @@ import BottomNav from '@/components/pec-ai/BottomNav';
 export const metadata: Metadata = {
   title: 'PEC.AI - Comunicação Alternativa com IA',
   description: 'Crie cartões de comunicação PEC personalizados com Inteligência Artificial. Facilitando a comunicação para pessoas com necessidades especiais.',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  viewport: 'width=device-width, initial-scale=1, user-scalable=yes',
   icons: {
     icon: [
       { url: '/logo.svg', type: 'image/svg+xml' },
