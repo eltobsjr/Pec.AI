@@ -63,8 +63,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F0F8FF] to-[#A0D2EB]/20">
-      <div className="container mx-auto px-4 py-6 sm:py-12 flex items-center justify-center min-h-screen">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-[#F0F8FF] to-[#A0D2EB]/20">
+      <div className="container mx-auto px-4 py-6 sm:py-12 flex items-center justify-center h-screen">
         <Card className="w-full max-w-[95vw] sm:max-w-md shadow-2xl">
         <CardHeader className="space-y-2 text-center">
           <div className="mx-auto mb-3 sm:mb-4">

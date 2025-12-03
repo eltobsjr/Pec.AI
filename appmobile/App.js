@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const WEBSITE_URL = 'https://pec-ai.vercel.app';
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar style="auto" />
       
       <WebView
@@ -23,8 +24,10 @@ export default function App() {
         originWhitelist={['*']}
         javaScriptCanOpenWindowsAutomatically={true}
         mixedContentMode="always"
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
