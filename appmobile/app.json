@@ -14,7 +14,12 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.uapps.pecai"
+      "bundleIdentifier": "com.uapps.pecai",
+      "infoPlist": {
+        "NSCameraUsageDescription": "O PEC.AI precisa acessar sua câmera para criar cartões de comunicação a partir de fotos.",
+        "NSPhotoLibraryUsageDescription": "O PEC.AI precisa acessar suas fotos para criar cartões de comunicação.",
+        "NSMicrophoneUsageDescription": "O PEC.AI precisa acessar o microfone para funcionalidades de áudio."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +28,12 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.uapps.pecai",
-      "permissions": ["INTERNET"]
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

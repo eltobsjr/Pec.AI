@@ -26,6 +26,10 @@ export default function App() {
         mixedContentMode="always"
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
+        allowFileAccess={true}
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
+        geolocationEnabled={true}
       />
     </SafeAreaView>
   );
