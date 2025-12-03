@@ -224,9 +224,7 @@ export default function SignupPage() {
           </CardFooter>
         </form>
       </Card>
-      <p className="text-center text-xs sm:text-sm text-muted-foreground mt-4">
-        Desenvolvido por <strong>Uapps by eltobsjr</strong>
-      </p>
+      
       </div>
     </div>
   );
