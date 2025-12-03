@@ -116,6 +116,9 @@ export default function ProfilePage() {
                 para criar cartões personalizados de comunicação PEC (Picture Exchange Communication System). 
                 Nosso objetivo é facilitar a comunicação para pessoas com necessidades especiais.
               </p>
+              <p className="text-sm text-muted-foreground mt-4">
+                Desenvolvido por <strong>Uapps by eltobsjr</strong>
+              </p>
             </CardContent>
           </Card>
         </div>

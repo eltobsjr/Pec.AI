@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,8 +101,14 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0F8FF] to-[#A0D2EB]/20 p-4">
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-2">
-            <Lock className="h-8 w-8 text-primary-foreground" />
+          <div className="mx-auto mb-4">
+            <Image
+              src="/logo.svg"
+              alt="PEC.AI Logo"
+              width={120}
+              height={40}
+              className="mx-auto"
+            />
           </div>
           <CardTitle className="text-3xl font-bold">Nova Senha</CardTitle>
           <CardDescription>

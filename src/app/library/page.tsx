@@ -123,6 +123,9 @@ export default function LibraryPage() {
           />
         </div>
       </main>
+      <footer className="container mx-auto p-4 md:px-6 text-center text-sm text-muted-foreground">
+        <p>Desenvolvido por <strong>Uapps by eltobsjr</strong></p>
+      </footer>
     </div>
   );
 }

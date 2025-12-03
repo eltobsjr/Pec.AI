@@ -173,6 +173,9 @@ export default function SettingsPage() {
           </Card>
         </div>
       </main>
+      <footer className="container mx-auto p-4 md:px-6 text-center text-sm text-muted-foreground">
+        <p>Desenvolvido por <strong>Uapps by eltobsjr</strong></p>
+      </footer>
 
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>

@@ -180,7 +180,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="container mx-auto p-4 md:px-6 text-center text-sm text-muted-foreground">
-        <p>PEC.AI - Criado com Inteligência Artificial</p>
+        <p>Desenvolvido por <strong>Uapps by eltobsjr</strong></p>
       </footer>
     </div>
   );
