@@ -34,6 +34,7 @@ export default function PecCard({
   idInPhrase
 }: PecCardProps) {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('application/pec-ai-item', JSON.stringify({
@@ -77,14 +78,22 @@ export default function PecCard({
         location === 'phrase' && 'h-full flex flex-col',
     )}>
         <CardContent className={cn("aspect-square flex items-center justify-center p-2 bg-slate-50 relative", location === 'phrase' && 'flex-grow')}>
-            <Image
-                src={card.imageSrc}
-                alt={card.name}
-                width={150}
-                height={150}
-                className="object-contain h-full w-full"
-                unoptimized // for data URIs
-            />
+            {!imageError ? (
+              <Image
+                  src={card.imageSrc}
+                  alt={card.name}
+                  width={150}
+                  height={150}
+                  className="object-contain h-full w-full"
+                  unoptimized
+                  onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-muted-foreground">
+                <span className="text-4xl">🖼️</span>
+                <span className="text-xs mt-2">Imagem não disponível</span>
+              </div>
+            )}
             {location === 'library' && onAddToPhrase && (
                 <Button
                     variant="accent"

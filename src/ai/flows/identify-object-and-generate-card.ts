@@ -39,6 +39,7 @@ export async function identifyObjectAndGenerateCard(
 
 const identifyObjectPrompt = ai.definePrompt({
   name: 'identifyObjectPrompt',
+  model: 'googleai/gemini-2.0-flash',
   input: {schema: IdentifyObjectAndGenerateCardInputSchema},
   output: {schema: z.object({objectName: z.string(), category: z.string()})},
   prompt: `You are an AI assistant specialized in identifying objects in images and determining their category.
@@ -50,6 +51,7 @@ const identifyObjectPrompt = ai.definePrompt({
 
 const removeBackgroundAndGenerateCardPrompt = ai.definePrompt({
   name: 'removeBackgroundAndGenerateCardPrompt',
+  model: 'googleai/gemini-2.0-flash',
   input: {schema: z.object({photoDataUri: z.string(), objectName: z.string(), category: z.string()})},
   output: {schema: z.object({cardDataUri: z.string()})},
   prompt: `You are an AI assistant specialized in removing backgrounds from images and generating visual cards.

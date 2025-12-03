@@ -97,15 +97,10 @@ export async function deleteCard(cardId: string): Promise<void> {
     .single();
 
   if (card) {
-    // Deletar imagens do storage
+    // Deletar imagem do storage (agora só temos original-images)
     if (card.image_url) {
       const imagePath = card.image_url.split('/').slice(-2).join('/');
-      await supabase.storage.from('pec-cards').remove([imagePath]);
-    }
-    
-    if (card.original_image_url) {
-      const originalPath = card.original_image_url.split('/').slice(-2).join('/');
-      await supabase.storage.from('original-images').remove([originalPath]);
+      await supabase.storage.from('original-images').remove([imagePath]);
     }
   }
 

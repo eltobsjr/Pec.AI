@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { identifyObjectAndGenerateCard } from '@/ai/flows/identify-object-and-generate-card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Upload, Camera, FileUp } from 'lucide-react';
+import { Label } from '../ui/label';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,9 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [manualName, setManualName] = useState('');
+  const [manualCategory, setManualCategory] = useState('');
+  const [useManual, setUseManual] = useState(false);
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,51 +69,66 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
       return;
     }
 
+    if (useManual && (!manualName.trim() || !manualCategory.trim())) {
+      toast({
+        title: 'Campos obrigatórios',
+        description: 'Preencha o nome e categoria do cartão.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // 1. Identificar objeto e gerar cartão com IA
-      const result = await identifyObjectAndGenerateCard({ photoDataUri: imageSource });
-      
-      // 2. Fazer upload das imagens para Supabase Storage
-      const { uploadImage } = await import('@/lib/services/storage');
-      
-      // Upload da imagem original
-      const originalImageUrl = await uploadImage(
-        imageSource,
-        'original-images'
-      );
-      
-      // Upload do cartão processado
-      const cardImageUrl = await uploadImage(
-        result.cardDataUri,
-        'pec-cards'
-      );
+      if (useManual) {
+        // Modo manual: criar cartão sem IA
+        const { createManualCard } = await import('@/lib/services/manual-cards');
+        const result = await createManualCard({
+          name: manualName.trim(),
+          category: manualCategory.trim(),
+          imageDataUri: imageSource,
+        });
 
-      // 3. Criar registro no banco de dados
-      const { createCard } = await import('@/lib/services/cards');
-      await createCard({
-        name: result.objectName,
-        category: result.category,
-        image_url: cardImageUrl,
-        original_image_url: originalImageUrl,
-      });
+        toast({
+          title: 'Sucesso!',
+          description: `Cartão "${manualName}" criado e adicionado à biblioteca.`,
+          className: 'bg-green-100 border-green-300 text-green-800'
+        });
+      } else {
+        // Modo IA: identificar objeto e gerar cartão
+        const result = await identifyObjectAndGenerateCard({ photoDataUri: imageSource });
+        
+        const { uploadImage } = await import('@/lib/services/storage');
+        
+        // Upload da imagem original (usada tanto como original quanto como cartão)
+        const imageUrl = await uploadImage(
+          imageSource,
+          'original-images'
+        );
 
-      toast({
-        title: 'Sucesso!',
-        description: `Cartão "${result.objectName}" criado e adicionado à biblioteca.`,
-        className: 'bg-green-100 border-green-300 text-green-800'
-      });
+        const { createCard } = await import('@/lib/services/cards');
+        await createCard({
+          name: result.objectName,
+          category: result.category,
+          image_url: imageUrl,
+          original_image_url: imageUrl,
+        });
+
+        toast({
+          title: 'Sucesso!',
+          description: `Cartão "${result.objectName}" criado e adicionado à biblioteca.`,
+          className: 'bg-green-100 border-green-300 text-green-800'
+        });
+      }
       
       resetAndClose();
-      
-      // Recarregar a página para atualizar a lista de cartões
       window.location.reload();
     } catch (error) {
       console.error('Error generating card:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível gerar o cartão. Tente novamente.',
+        description: useManual ? 'Não foi possível criar o cartão.' : 'Não foi possível gerar o cartão. Tente o modo manual.',
         variant: 'destructive',
       });
     } finally {
@@ -122,6 +141,9 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
     setFile(null);
     setFilePreview(null);
     setCapturedImage(null);
+    setManualName('');
+    setManualCategory('');
+    setUseManual(false);
     setIsLoading(false);
   }
 
@@ -139,9 +161,10 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
         </DialogHeader>
 
         <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="upload"><FileUp className="mr-2 h-4 w-4"/> Enviar Foto</TabsTrigger>
-            <TabsTrigger value="camera"><Camera className="mr-2 h-4 w-4"/> Tirar Foto</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="upload"><FileUp className="mr-2 h-4 w-4"/> Enviar</TabsTrigger>
+            <TabsTrigger value="camera"><Camera className="mr-2 h-4 w-4"/> Câmera</TabsTrigger>
+            <TabsTrigger value="manual"><Upload className="mr-2 h-4 w-4"/> Manual</TabsTrigger>
           </TabsList>
           <TabsContent value="upload">
             <div className="grid gap-4 py-4">
@@ -162,6 +185,46 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
           <TabsContent value="camera">
              <CameraCapture onImageCaptured={handleImageCaptured} capturedImage={capturedImage} />
           </TabsContent>
+          <TabsContent value="manual" className="space-y-4">
+            <div className="grid gap-4 py-4">
+              <label htmlFor="manual-upload" className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80 transition-colors ${filePreview || capturedImage ? '' : 'p-5'}`}>
+                {filePreview || capturedImage ? (
+                  <Image src={filePreview || capturedImage || ''} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg" />
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    <Upload className="w-10 h-10 mx-auto mb-3" />
+                    <p className="font-semibold">Clique para enviar imagem</p>
+                    <p className="text-xs">PNG, JPG ou WEBP</p>
+                  </div>
+                )}
+              </label>
+              <Input id="manual-upload" type="file" accept="image/*" onChange={(e) => { handleFileChange(e); setUseManual(true); }} disabled={isLoading} className="sr-only" />
+              
+              <div className="space-y-2">
+                <Label htmlFor="manual-name">Nome do Objeto</Label>
+                <Input 
+                  id="manual-name" 
+                  type="text" 
+                  placeholder="Ex: Maçã, Cachorro, Casa..."
+                  value={manualName}
+                  onChange={(e) => setManualName(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="manual-category">Categoria</Label>
+                <Input 
+                  id="manual-category" 
+                  type="text" 
+                  placeholder="Ex: Alimentos, Animais, Lugares..."
+                  value={manualCategory}
+                  onChange={(e) => setManualCategory(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
         
         <DialogFooter>
@@ -169,10 +232,10 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Gerando Cartão...
+                {useManual ? 'Criando Cartão...' : 'Gerando Cartão...'}
               </>
             ) : (
-              'Gerar Cartão'
+              useManual ? 'Criar Cartão' : 'Gerar com IA'
             )}
           </Button>
         </DialogFooter>

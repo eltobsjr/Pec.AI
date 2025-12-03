@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function uploadImage(
   file: File | string,
-  bucket: 'original-images' | 'pec-cards' | 'avatars',
+  bucket: 'original-images' | 'avatars',
   filename?: string
 ): Promise<string> {
   const supabase = await createClient();
@@ -30,13 +30,10 @@ export async function uploadImage(
   if (typeof file === 'string') {
     const base64Data = file.split(',')[1];
     const mimeType = file.match(/data:([^;]+);/)?.[1] || 'image/png';
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    fileToUpload = new Blob([byteArray], { type: mimeType });
+    
+    // Usar Buffer do Node.js ao invés de atob (que é API do browser)
+    const buffer = Buffer.from(base64Data, 'base64');
+    fileToUpload = new Blob([buffer], { type: mimeType });
   } else {
     fileToUpload = file;
   }
@@ -61,7 +58,7 @@ export async function uploadImage(
   return publicUrl;
 }
 
-export async function deleteImage(url: string, bucket: 'original-images' | 'pec-cards' | 'avatars'): Promise<void> {
+export async function deleteImage(url: string, bucket: 'original-images' | 'avatars'): Promise<void> {
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();
