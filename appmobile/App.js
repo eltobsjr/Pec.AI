@@ -7,7 +7,7 @@ const WEBSITE_URL = 'https://pec-ai.vercel.app';
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <StatusBar style="auto" />
       
       <WebView
