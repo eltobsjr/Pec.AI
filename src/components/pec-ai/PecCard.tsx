@@ -145,7 +145,7 @@ export default function PecCard({
         "overflow-hidden transition-all duration-200 hover:shadow-xl hover:-translate-y-1 bg-white border rounded-lg group/card",
         location === 'phrase' && 'h-full flex flex-col',
     )}>
-        <CardContent className={cn("aspect-square flex items-center justify-center p-1.5 sm:p-2 bg-slate-50 relative", location === 'phrase' && 'flex-grow')}>
+        <CardContent className={cn("aspect-square flex items-center justify-center p-1 sm:p-2 bg-slate-50 relative", location === 'phrase' && 'flex-grow')}>
             {!imageError ? (
               <Image
                   src={card.imageSrc}
@@ -158,8 +158,8 @@ export default function PecCard({
               />
             ) : (
               <div className="flex flex-col items-center justify-center text-muted-foreground">
-                <span className="text-2xl sm:text-4xl">🖼️</span>
-                <span className="text-[10px] sm:text-xs mt-1 sm:mt-2">Imagem não disponível</span>
+                <span className="text-xl sm:text-4xl">🖼️</span>
+                <span className="text-[10px] sm:text-xs mt-1 sm:mt-2 text-center leading-tight">Imagem indisponível</span>
               </div>
             )}
             {location === 'library' && onAddToPhrase && (
@@ -188,8 +188,8 @@ export default function PecCard({
                 </Button>
             )}
         </CardContent>
-        <CardFooter className={cn("p-1.5 sm:p-2 bg-white", location === 'phrase' && "flex-shrink-0")}>
-            <p className="font-semibold truncate w-full text-center text-xs sm:text-sm">{card.name}</p>
+        <CardFooter className={cn("p-1 sm:p-2 bg-white", location === 'phrase' && "flex-shrink-0")}>
+            <p className="font-semibold truncate w-full text-center text-[10px] xs:text-xs sm:text-sm leading-tight">{card.name}</p>
         </CardFooter>
     </Card>
   );

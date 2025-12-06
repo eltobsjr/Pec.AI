@@ -360,8 +360,8 @@ export default function PhraseBuilder({
                 </Button>
             </div>
         </div>
-        <div className="flex items-center gap-1.5 sm:gap-2 self-start md:self-center pt-2 md:pt-0 flex-wrap w-full md:w-auto">
-          <Button onClick={speakPhrase} disabled={items.length === 0 || isSpeaking} variant="accent" className="text-xs sm:text-sm h-9 sm:h-10 flex-1 sm:flex-none">
+        <div className="grid grid-cols-4 gap-2 w-full md:w-auto md:flex md:items-center pt-2 md:pt-0">
+          <Button onClick={speakPhrase} disabled={items.length === 0 || isSpeaking} variant="accent" className="col-span-3 md:w-auto text-xs sm:text-sm h-10">
             {isSpeaking ? (
               <Loader2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
             ) : (
@@ -370,19 +370,11 @@ export default function PhraseBuilder({
             <span className="hidden xs:inline">{isSpeaking ? 'Falando...' : 'Falar Frase'}</span>
             <span className="xs:hidden">{isSpeaking ? 'Falar...' : 'Falar'}</span>
           </Button>
-          <PhraseHistory onLoadPhrase={(phraseItems) => {
-            onClear();
-            phraseItems.forEach(item => onAddItem(item));
-          }} />
-          <Button onClick={onClear} disabled={items.length === 0} variant="outline" className="text-destructive hover:bg-destructive/10 hover:text-destructive text-xs sm:text-sm h-9 sm:h-10 flex-1 sm:flex-none">
-            <XCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">Limpar</span>
-            <span className="xs:hidden">Limp.</span>
-          </Button>
-            <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+
+          <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
-                        <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <Button variant="outline" size="icon" className="col-span-1 md:w-10 h-10 w-full">
+                        <Settings className="h-4 w-4" />
                         <span className="sr-only">Configurações</span>
                     </Button>
                 </DialogTrigger>
@@ -440,12 +432,25 @@ export default function PhraseBuilder({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+          <PhraseHistory 
+            className="col-span-2 md:w-auto h-10 w-full"
+            onLoadPhrase={(phraseItems) => {
+            onClear();
+            phraseItems.forEach(item => onAddItem(item));
+          }} />
+          
+          <Button onClick={onClear} disabled={items.length === 0} variant="outline" className="col-span-2 md:w-auto text-destructive hover:bg-destructive/10 hover:text-destructive text-xs sm:text-sm h-10 w-full">
+            <XCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Limpar</span>
+            <span className="xs:hidden">Limp.</span>
+          </Button>
         </div>
       </div>
-      <div className="flex items-stretch gap-2 sm:gap-3 md:gap-4 min-h-[140px] sm:min-h-[180px] w-full overflow-x-auto scrollbar-thin p-2 sm:p-3 md:p-4 rounded-lg bg-muted/50 border-2 border-dashed">
+      <div className="flex items-stretch gap-2 sm:gap-3 md:gap-4 min-h-[130px] sm:min-h-[180px] w-full overflow-x-auto scrollbar-thin p-2 sm:p-3 md:p-4 rounded-lg bg-muted/50 border-2 border-dashed">
         {items.length > 0 ? (
           items.map((item, index) => (
-            <div key={item.id} className="flex-shrink-0 w-28 sm:w-32 md:w-36">
+            <div key={item.id} className="flex-shrink-0 w-24 sm:w-32 md:w-36">
               {item.type === 'card' ? (
                  <PecCardComponent
                     card={item.data}
@@ -484,9 +489,9 @@ export default function PhraseBuilder({
             </div>
           ))
         ) : (
-          <div className="w-full text-center text-muted-foreground flex flex-col items-center justify-center">
-            <p className='font-semibold'>Arraste os cartões para cá</p>
-            <p className='text-sm'>Ou digite uma palavra para começar a montar sua frase.</p>
+          <div className="w-full text-center text-muted-foreground flex flex-col items-center justify-center px-4">
+            <p className='font-semibold text-sm sm:text-base'>Arraste os cartões para cá</p>
+            <p className='text-xs sm:text-sm mt-1'>Ou digite uma palavra para começar a montar sua frase.</p>
           </div>
         )}
       </div>

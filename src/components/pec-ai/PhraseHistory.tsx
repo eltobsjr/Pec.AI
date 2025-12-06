@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -30,9 +31,10 @@ import {
 
 type PhraseHistoryProps = {
   onLoadPhrase: (phraseItems: PhraseItem[]) => void;
+  className?: string;
 };
 
-export default function PhraseHistory({ onLoadPhrase }: PhraseHistoryProps) {
+export default function PhraseHistory({ onLoadPhrase, className }: PhraseHistoryProps) {
   const [open, setOpen] = useState(false);
   const [phrases, setPhrases] = useState<SavedPhrase[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +97,7 @@ export default function PhraseHistory({ onLoadPhrase }: PhraseHistoryProps) {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="text-xs sm:text-sm h-9 sm:h-10 flex-1 sm:flex-none">
+          <Button variant="outline" className={cn("text-xs sm:text-sm h-9 sm:h-10", className)}>
             <Clock className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="hidden xs:inline">Histórico</span>
             <span className="xs:hidden">Hist.</span>
