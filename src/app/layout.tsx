@@ -6,10 +6,16 @@ import { GeistSans } from 'geist/font/sans';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import BottomNav from '@/components/pec-ai/BottomNav';
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: 'PEC.AI - Comunicação Alternativa com IA',
   description: 'Crie cartões de comunicação PEC personalizados com Inteligência Artificial. Facilitando a comunicação para pessoas com necessidades especiais.',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
