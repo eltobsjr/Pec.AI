@@ -376,7 +376,8 @@ export default function PhraseBuilder({
           }} />
           <Button onClick={onClear} disabled={items.length === 0} variant="outline" className="text-destructive hover:bg-destructive/10 hover:text-destructive text-xs sm:text-sm h-9 sm:h-10 flex-1 sm:flex-none">
             <XCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            Limpar
+            <span className="hidden xs:inline">Limpar</span>
+            <span className="xs:hidden">Limp.</span>
           </Button>
             <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>

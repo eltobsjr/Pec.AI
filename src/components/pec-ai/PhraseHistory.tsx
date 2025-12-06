@@ -95,9 +95,10 @@ export default function PhraseHistory({ onLoadPhrase }: PhraseHistoryProps) {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="sm">
-            <Clock className="mr-2 h-4 w-4" />
-            Histórico
+          <Button variant="outline" className="text-xs sm:text-sm h-9 sm:h-10 flex-1 sm:flex-none">
+            <Clock className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Histórico</span>
+            <span className="xs:hidden">Hist.</span>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[600px]">
