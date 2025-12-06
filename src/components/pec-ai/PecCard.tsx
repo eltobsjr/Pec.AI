@@ -142,54 +142,54 @@ export default function PecCard({
 
   const cardContent = (
     <Card className={cn(
-        "overflow-hidden transition-all duration-200 hover:shadow-xl hover:-translate-y-1 bg-white border rounded-lg group/card",
+        "overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 bg-white border rounded-lg group/card",
         location === 'phrase' && 'h-full flex flex-col',
     )}>
-        <CardContent className={cn("aspect-square flex items-center justify-center p-1 sm:p-2 bg-slate-50 relative", location === 'phrase' && 'flex-grow')}>
+        <CardContent className={cn("aspect-square flex items-center justify-center p-1.5 sm:p-2 bg-slate-50 relative", location === 'phrase' && 'flex-grow')}>
             {!imageError ? (
               <Image
                   src={card.imageSrc}
                   alt={card.name}
-                  width={150}
-                  height={150}
+                  width={120}
+                  height={120}
                   className="object-contain h-full w-full"
                   unoptimized
                   onError={() => setImageError(true)}
               />
             ) : (
-              <div className="flex flex-col items-center justify-center text-muted-foreground">
-                <span className="text-xl sm:text-4xl">🖼️</span>
-                <span className="text-[10px] sm:text-xs mt-1 sm:mt-2 text-center leading-tight">Imagem indisponível</span>
+              <div className="flex flex-col items-center justify-center text-muted-foreground h-full">
+                <span className="text-2xl sm:text-3xl">🖼️</span>
+                <span className="text-[9px] xs:text-[10px] sm:text-xs mt-0.5 sm:mt-1 text-center leading-tight px-1">Imagem indisponível</span>
               </div>
             )}
             {location === 'library' && onAddToPhrase && (
                 <Button
                     variant="accent"
                     size="icon"
-                    className="absolute bottom-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity z-20"
+                    className="absolute bottom-1.5 right-1.5 h-7 w-7 sm:h-8 sm:w-8 rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity z-20"
                     onClick={() => onAddToPhrase(card)}
                     aria-label={`Adicionar ${card.name} à frase`}
                 >
-                    <PlusCircle className="h-5 w-5" />
+                    <PlusCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
             )}
             {location === 'library' && onToggleFavorite && (
                 <Button
                     variant={card.isFavorite ? "default" : "secondary"}
                     size="icon"
-                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity z-20"
+                    className="absolute top-1.5 right-1.5 h-7 w-7 sm:h-8 sm:w-8 rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity z-20"
                     onClick={(e) => {
                         e.stopPropagation();
                         onToggleFavorite(card.id);
                     }}
                     aria-label={card.isFavorite ? `Remover ${card.name} dos favoritos` : `Adicionar ${card.name} aos favoritos`}
                 >
-                    <Star className={cn("h-5 w-5", card.isFavorite && "fill-current")} />
+                    <Star className={cn("h-4 w-4 sm:h-5 sm:w-5", card.isFavorite && "fill-current")} />
                 </Button>
             )}
         </CardContent>
-        <CardFooter className={cn("p-1 sm:p-2 bg-white", location === 'phrase' && "flex-shrink-0")}>
-            <p className="font-semibold truncate w-full text-center text-[10px] xs:text-xs sm:text-sm leading-tight">{card.name}</p>
+        <CardFooter className={cn("p-1 xs:p-1.5 sm:p-2 bg-white", location === 'phrase' && "flex-shrink-0")}>
+            <p className="font-semibold truncate w-full text-center text-[9px] xs:text-[10px] sm:text-xs leading-tight">{card.name}</p>
         </CardFooter>
     </Card>
   );

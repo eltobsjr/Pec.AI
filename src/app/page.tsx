@@ -241,8 +241,8 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <OnboardingTutorial />
       <Header />
-      <main className="flex-grow container mx-auto p-2 sm:p-4 md:p-6 lg:p-8">
-        <div className="grid gap-4 sm:gap-6 md:gap-8">
+      <main className="flex-grow container mx-auto px-3 py-3 sm:p-4 md:p-6 lg:p-8 max-w-screen-2xl">
+        <div className="space-y-4 sm:space-y-6 md:space-y-8">
           <PhraseBuilder
             items={phraseItems}
             onAddItem={addItemToPhrase}

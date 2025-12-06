@@ -49,11 +49,11 @@ export default function CardLibrary({
   }, [cards, searchQuery]);
 
   return (
-    <div className="bg-card p-3 sm:p-4 md:p-6 rounded-xl shadow-lg border">
-       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-        <h2 className="text-xl sm:text-2xl font-bold">Biblioteca de Cartões</h2>
+    <section className="bg-card p-3 sm:p-4 md:p-5 rounded-xl shadow-lg border">
+       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-3 sm:mb-4">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold">Biblioteca de Cartões</h2>
         <ImageUploader onCardGenerated={addCardToLibrary}>
-            <Button ref={newCardButtonRef}>
+            <Button ref={newCardButtonRef} className="w-full sm:w-auto">
               <PlusCircle className="mr-2 h-4 w-4" />
               Novo Cartão
             </Button>
@@ -131,7 +131,7 @@ export default function CardLibrary({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 mt-3 sm:mt-4">
+        <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2 sm:gap-3 md:gap-4 mt-3 sm:mt-4">
           {filteredCards.map((card) => (
             <PecCard
               key={card.id}
@@ -144,6 +144,6 @@ export default function CardLibrary({
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

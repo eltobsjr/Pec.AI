@@ -97,10 +97,9 @@ export default function PhraseHistory({ onLoadPhrase, className }: PhraseHistory
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className={cn("text-xs sm:text-sm h-9 sm:h-10", className)}>
-            <Clock className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">Histórico</span>
-            <span className="xs:hidden">Hist.</span>
+          <Button variant="outline" className={cn("text-xs sm:text-sm", className)}>
+            <Clock className="h-4 w-4 sm:mr-2" />
+            <span>Histórico</span>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[600px]">

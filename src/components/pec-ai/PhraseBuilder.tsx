@@ -329,21 +329,22 @@ export default function PhraseBuilder({
     };
   }, []);
 
-  const dropZoneClass = `bg-card p-3 sm:p-4 rounded-xl shadow-lg border-2 transition-all duration-300 ${
+  const dropZoneClass = `bg-card p-3 sm:p-4 md:p-5 rounded-xl shadow-lg border-2 transition-all duration-300 ${
     isDragOver ? 'border-accent bg-accent/10 border-dashed' : 'border-transparent'
   }`;
 
   return (
-    <div
+    <section
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={dropZoneClass}
       aria-label="Área para montar frase"
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-        <div className='flex-grow w-full md:w-auto'>
-            <h2 className="text-xl sm:text-2xl font-bold mb-2">Montar Frase</h2>
+      <div className="space-y-3">
+        {/* Título e Input - Linha 1 */}
+        <div className="w-full">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">Montar Frase</h2>
             <div className="flex gap-2 w-full">
                 <Input 
                     type="text" 
@@ -351,29 +352,55 @@ export default function PhraseBuilder({
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddText()}
-                    className="bg-background text-sm sm:text-base flex-1 min-w-0"
+                    className="bg-background text-sm sm:text-base flex-1 min-w-0 h-10"
                 />
-                <Button onClick={handleAddText} variant="secondary" disabled={!textInput.trim()} className="text-xs sm:text-sm h-9 sm:h-10 shrink-0">
-                    <MessageSquarePlus className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"/>
-                    <span className="hidden xs:inline">Adicionar</span>
-                    <span className="xs:hidden">+</span>
+                <Button onClick={handleAddText} variant="secondary" disabled={!textInput.trim()} className="text-xs sm:text-sm h-10 px-3 shrink-0">
+                    <MessageSquarePlus className="h-4 w-4 sm:mr-2"/>
+                    <span className="hidden sm:inline">Adicionar</span>
                 </Button>
             </div>
         </div>
-        <div className="grid grid-cols-4 gap-2 w-full md:w-auto md:flex md:items-center pt-2 md:pt-0">
-          <Button onClick={speakPhrase} disabled={items.length === 0 || isSpeaking} variant="accent" className="col-span-3 md:w-auto text-xs sm:text-sm h-10">
+
+        {/* Botões de Ação - Linha 2 - Layout Mobile Otimizado */}
+        <div className="grid grid-cols-2 gap-2 w-full">
+          {/* Botão Falar - Ocupa toda primeira linha em mobile */}
+          <Button 
+            onClick={speakPhrase} 
+            disabled={items.length === 0 || isSpeaking} 
+            variant="accent" 
+            className="col-span-2 sm:col-span-1 text-xs sm:text-sm h-10"
+          >
             {isSpeaking ? (
-              <Loader2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 sm:mr-2 animate-spin" />
             ) : (
-              <Volume2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <Volume2 className="h-4 w-4 sm:mr-2" />
             )}
-            <span className="hidden xs:inline">{isSpeaking ? 'Falando...' : 'Falar Frase'}</span>
-            <span className="xs:hidden">{isSpeaking ? 'Falar...' : 'Falar'}</span>
+            <span>{isSpeaking ? 'Falando...' : 'Falar Frase'}</span>
           </Button>
 
+          {/* Histórico */}
+          <PhraseHistory 
+            className="h-10"
+            onLoadPhrase={(phraseItems) => {
+            onClear();
+            phraseItems.forEach(item => onAddItem(item));
+          }} />
+          
+          {/* Limpar */}
+          <Button 
+            onClick={onClear} 
+            disabled={items.length === 0} 
+            variant="outline" 
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive text-xs sm:text-sm h-10"
+          >
+            <XCircle className="h-4 w-4 sm:mr-2" />
+            <span>Limpar</span>
+          </Button>
+
+          {/* Configurações */}
           <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" size="icon" className="col-span-1 md:w-10 h-10 w-full">
+                    <Button variant="outline" size="icon" className="h-10 w-full">
                         <Settings className="h-4 w-4" />
                         <span className="sr-only">Configurações</span>
                     </Button>
@@ -432,25 +459,12 @@ export default function PhraseBuilder({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-
-          <PhraseHistory 
-            className="col-span-2 md:w-auto h-10 w-full"
-            onLoadPhrase={(phraseItems) => {
-            onClear();
-            phraseItems.forEach(item => onAddItem(item));
-          }} />
-          
-          <Button onClick={onClear} disabled={items.length === 0} variant="outline" className="col-span-2 md:w-auto text-destructive hover:bg-destructive/10 hover:text-destructive text-xs sm:text-sm h-10 w-full">
-            <XCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">Limpar</span>
-            <span className="xs:hidden">Limp.</span>
-          </Button>
         </div>
       </div>
-      <div className="flex items-stretch gap-2 sm:gap-3 md:gap-4 min-h-[130px] sm:min-h-[180px] w-full overflow-x-auto scrollbar-thin p-2 sm:p-3 md:p-4 rounded-lg bg-muted/50 border-2 border-dashed">
+      <div className="flex items-stretch gap-2 sm:gap-3 min-h-[120px] sm:min-h-[140px] md:min-h-[160px] w-full overflow-x-auto p-2 sm:p-3 md:p-4 rounded-lg bg-muted/50 border-2 border-dashed">
         {items.length > 0 ? (
           items.map((item, index) => (
-            <div key={item.id} className="flex-shrink-0 w-24 sm:w-32 md:w-36">
+            <div key={item.id} className="flex-shrink-0 w-20 xs:w-24 sm:w-28 md:w-32">
               {item.type === 'card' ? (
                  <PecCardComponent
                     card={item.data}
@@ -495,6 +509,6 @@ export default function PhraseBuilder({
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
