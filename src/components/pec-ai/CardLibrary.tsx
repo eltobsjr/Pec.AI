@@ -131,7 +131,7 @@ export default function CardLibrary({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 mt-3 sm:mt-4">
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 mt-3 sm:mt-4">
           {filteredCards.map((card) => (
             <PecCard
               key={card.id}

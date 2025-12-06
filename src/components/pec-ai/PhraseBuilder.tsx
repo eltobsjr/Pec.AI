@@ -351,7 +351,7 @@ export default function PhraseBuilder({
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddText()}
-                    className="bg-background text-sm sm:text-base"
+                    className="bg-background text-sm sm:text-base flex-1 min-w-0"
                 />
                 <Button onClick={handleAddText} variant="secondary" disabled={!textInput.trim()} className="text-xs sm:text-sm h-9 sm:h-10 shrink-0">
                     <MessageSquarePlus className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"/>
