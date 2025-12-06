@@ -97,7 +97,12 @@ export default function ImageUploader({ onCardGenerated, children }: ImageUpload
         });
       } else {
         // Modo IA: identificar objeto e gerar cartão
-        const result = await identifyObjectAndGenerateCard({ photoDataUri: imageSource });
+        // Ler idioma configurado do localStorage (padrão: pt-BR)
+        const savedLanguage = localStorage.getItem('pec-ai-language') || 'pt-BR';
+        const result = await identifyObjectAndGenerateCard({ 
+          photoDataUri: imageSource,
+          language: savedLanguage
+        });
         
         const { uploadImage } = await import('@/lib/services/storage');
         

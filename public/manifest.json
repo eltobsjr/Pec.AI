@@ -1,0 +1,66 @@
+{
+  "name": "Pec.AI - Comunicação Alternativa",
+  "short_name": "Pec.AI",
+  "description": "Sistema de comunicação alternativa com PECs e síntese de voz, tornando a comunicação acessível para todos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "accessibility", "health"],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshot-narrow.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Criar Cartão",
+      "short_name": "Novo",
+      "description": "Criar um novo cartão PEC",
+      "url": "/?action=new",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Histórico",
+      "short_name": "Histórico",
+      "description": "Ver histórico de frases",
+      "url": "/?action=history",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

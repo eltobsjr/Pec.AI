@@ -37,7 +37,46 @@ export async function getCards(): Promise<PecCard[]> {
     name: card.name,
     category: card.category,
     imageSrc: card.image_url,
+    isFavorite: card.is_favorite || false,
   }));
+}
+
+export async function toggleFavorite(cardId: string): Promise<boolean> {
+  const supabase = await createClient();
+  
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('Usuário não autenticado');
+  }
+
+  // Buscar o estado atual
+  const { data: card } = await supabase
+    .from('cards')
+    .select('is_favorite')
+    .eq('id', cardId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!card) {
+    throw new Error('Cartão não encontrado');
+  }
+
+  const newFavoriteState = !card.is_favorite;
+
+  // Atualizar o estado
+  const { error } = await supabase
+    .from('cards')
+    .update({ is_favorite: newFavoriteState })
+    .eq('id', cardId)
+    .eq('user_id', user.id);
+
+  if (error) {
+    console.error('Erro ao atualizar favorito:', error);
+    throw error;
+  }
+
+  return newFavoriteState;
 }
 
 export async function createCard(card: {

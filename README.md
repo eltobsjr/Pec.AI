@@ -18,7 +18,16 @@
 
 ## 📖 Sobre o Projeto
 
-**PEC.AI** é uma aplicação web moderna que utiliza Inteligência Artificial para facilitar a comunicação de pessoas com necessidades especiais. Baseado no sistema **PEC (Picture Exchange Communication System)**, o app permite criar cartões visuais personalizados para auxiliar na expressão e comunicação.
+**PEC.AI** é uma plataforma de comunicação alternativa e aumentativa que combina Inteligência Artificial com o sistema **PECS (Picture Exchange Communication System)** para criar uma ferramenta moderna de inclusão e acessibilidade.
+
+O aplicativo foi desenvolvido para auxiliar crianças e adultos com dificuldades de comunicação verbal — incluindo pessoas com autismo, paralisia cerebral, síndrome de Down, afasia ou outras condições neurológicas — a se expressarem de forma visual e intuitiva através de cartões ilustrados.
+
+### Como Funciona?
+
+1. **Crie Cartões com IA**: Tire uma foto de qualquer objeto e a IA automaticamente identifica, categoriza e gera um cartão visual pronto para uso
+2. **Monte Frases**: Combine múltiplos cartões para formar frases completas, facilitando a comunicação de necessidades e desejos
+3. **Biblioteca Organizada**: Todos os cartões ficam salvos por categoria para fácil acesso
+4. **Áudio Integrado**: Cada cartão e frase pode ser falado em voz alta, auxiliando na compreensão e aprendizado
 
 ### ✨ Características Principais
 

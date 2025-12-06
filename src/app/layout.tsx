@@ -9,7 +9,13 @@ import BottomNav from '@/components/pec-ai/BottomNav';
 export const metadata: Metadata = {
   title: 'PEC.AI - Comunicação Alternativa com IA',
   description: 'Crie cartões de comunicação PEC personalizados com Inteligência Artificial. Facilitando a comunicação para pessoas com necessidades especiais.',
-  viewport: 'width=device-width, initial-scale=1, user-scalable=yes',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Pec.AI',
+  },
   icons: {
     icon: [
       { url: '/logo.svg', type: 'image/svg+xml' },
@@ -38,7 +44,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={GeistSans.className}>
-      <body className="pb-16">
+      <head>
+        <meta name="theme-color" content="#4F46E5" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+      </head>
+      <body className="pb-14 sm:pb-16">
         <AuthProvider>
           <main className="antialiased">{children}</main>
           <BottomNav />

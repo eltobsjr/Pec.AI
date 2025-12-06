@@ -56,3 +56,61 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Melhorias de responsividade e acessibilidade mobile */
+@layer utilities {
+  /* Prevenir seleção de texto em áreas de drag/touch */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Melhorar área de toque para botões pequenos */
+  @media (max-width: 640px) {
+    button, a {
+      min-height: 36px;
+      min-width: 36px;
+    }
+  }
+  
+  /* Smooth scrolling para listas horizontais */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevenir zoom duplo-tap em inputs */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Breakpoint customizado xs para telas muito pequenas */
+  @media (min-width: 360px) {
+    .xs\:inline {
+      display: inline;
+    }
+    .xs\:hidden {
+      display: none;
+    }
+  }
+}
+
+/* Ajustes de scrollbar para melhor UX */
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}

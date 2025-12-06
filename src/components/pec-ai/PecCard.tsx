@@ -1,10 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { PecCard as PecCardType } from '@/lib/types';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Trash2, X, PlusCircle } from 'lucide-react';
+import { Trash2, X, PlusCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -21,7 +21,12 @@ interface PecCardProps {
   onRemoveFromPhrase?: (id: string) => void;
   onReorderInPhrase?: (draggedId: string, targetId: string) => void;
   onAddToPhrase?: (card: PecCardType) => void;
+  onToggleFavorite?: (id: string) => void;
   idInPhrase?: string;
+  onMoveLeft?: () => void;
+  onMoveRight?: () => void;
+  canMoveLeft?: boolean;
+  canMoveRight?: boolean;
 }
 
 export default function PecCard({
@@ -31,10 +36,29 @@ export default function PecCard({
   onRemoveFromPhrase,
   onReorderInPhrase,
   onAddToPhrase,
-  idInPhrase
+  onToggleFavorite,
+  idInPhrase,
+  onMoveLeft,
+  onMoveRight,
+  canMoveLeft,
+  canMoveRight
 }: PecCardProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isLongPress, setIsLongPress] = useState(false);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const touchStartPos = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    // Detectar se é mobile
+    const checkMobile = () => {
+      setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('application/pec-ai-item', JSON.stringify({
@@ -72,12 +96,56 @@ export default function PecCard({
     }
   };
 
+  // Touch handlers para mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (location !== 'phrase' || !onReorderInPhrase) return;
+    
+    const touch = e.touches[0];
+    touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+    
+    // Long press para ativar drag mode
+    longPressTimer.current = setTimeout(() => {
+      setIsLongPress(true);
+      if (navigator.vibrate) {
+        navigator.vibrate(50); // Feedback tátil
+      }
+    }, 500);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartPos.current) return;
+
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartPos.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartPos.current.y);
+
+    // Se moveu mais de 10px, cancela long press (é scroll)
+    if ((deltaX > 10 || deltaY > 10) && longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+
+    // Se está em modo long press, previne scroll
+    if (isLongPress) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    setIsLongPress(false);
+    touchStartPos.current = null;
+  };
+
   const cardContent = (
     <Card className={cn(
         "overflow-hidden transition-all duration-200 hover:shadow-xl hover:-translate-y-1 bg-white border rounded-lg group/card",
         location === 'phrase' && 'h-full flex flex-col',
     )}>
-        <CardContent className={cn("aspect-square flex items-center justify-center p-2 bg-slate-50 relative", location === 'phrase' && 'flex-grow')}>
+        <CardContent className={cn("aspect-square flex items-center justify-center p-1.5 sm:p-2 bg-slate-50 relative", location === 'phrase' && 'flex-grow')}>
             {!imageError ? (
               <Image
                   src={card.imageSrc}
@@ -90,8 +158,8 @@ export default function PecCard({
               />
             ) : (
               <div className="flex flex-col items-center justify-center text-muted-foreground">
-                <span className="text-4xl">🖼️</span>
-                <span className="text-xs mt-2">Imagem não disponível</span>
+                <span className="text-2xl sm:text-4xl">🖼️</span>
+                <span className="text-[10px] sm:text-xs mt-1 sm:mt-2">Imagem não disponível</span>
               </div>
             )}
             {location === 'library' && onAddToPhrase && (
@@ -105,9 +173,23 @@ export default function PecCard({
                     <PlusCircle className="h-5 w-5" />
                 </Button>
             )}
+            {location === 'library' && onToggleFavorite && (
+                <Button
+                    variant={card.isFavorite ? "default" : "secondary"}
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8 rounded-full opacity-0 group-hover/card:opacity-100 transition-opacity z-20"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleFavorite(card.id);
+                    }}
+                    aria-label={card.isFavorite ? `Remover ${card.name} dos favoritos` : `Adicionar ${card.name} aos favoritos`}
+                >
+                    <Star className={cn("h-5 w-5", card.isFavorite && "fill-current")} />
+                </Button>
+            )}
         </CardContent>
-        <CardFooter className={cn("p-2 bg-white", location === 'phrase' && "flex-shrink-0")}>
-            <p className="font-semibold truncate w-full text-center text-sm">{card.name}</p>
+        <CardFooter className={cn("p-1.5 sm:p-2 bg-white", location === 'phrase' && "flex-shrink-0")}>
+            <p className="font-semibold truncate w-full text-center text-xs sm:text-sm">{card.name}</p>
         </CardFooter>
     </Card>
   );
@@ -115,19 +197,53 @@ export default function PecCard({
   return (
     <TooltipProvider delayDuration={300}>
       <div
-        draggable
+        draggable={!isMobile && location === 'phrase'}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         className={cn(
-          'relative group/card-wrapper touch-none cursor-grab focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg',
+          'relative group/card-wrapper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg',
+          !isMobile && location === 'phrase' && 'cursor-grab touch-none',
+          isMobile && 'touch-pan-y',
           isDragOver && location === 'phrase' ? 'scale-105 shadow-2xl z-10' : '',
+          isLongPress && location === 'phrase' ? 'opacity-80 scale-95 shadow-2xl' : '',
           location === 'phrase' && 'h-full'
         )}
         tabIndex={0}
       >
         {cardContent}
+
+        {/* Botões de reordenação para mobile na frase */}
+        {isMobile && location === 'phrase' && (
+          <>
+            {canMoveLeft && (
+              <Button
+                variant="secondary"
+                size="icon"
+                className="absolute top-1/2 -left-3 transform -translate-y-1/2 h-8 w-8 rounded-full z-20 bg-background shadow-lg"
+                onClick={onMoveLeft}
+                aria-label="Mover para esquerda"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
+            {canMoveRight && (
+              <Button
+                variant="secondary"
+                size="icon"
+                className="absolute top-1/2 -right-3 transform -translate-y-1/2 h-8 w-8 rounded-full z-20 bg-background shadow-lg"
+                onClick={onMoveRight}
+                aria-label="Mover para direita"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            )}
+          </>
+        )}
 
         {location === 'library' && onDeleteFromLibrary && (
           <Tooltip>
@@ -157,7 +273,10 @@ export default function PecCard({
                     <Button
                         variant="secondary"
                         size="icon"
-                        className="absolute -top-3 -right-3 h-7 w-7 rounded-full opacity-0 group-hover/card-wrapper:opacity-100 transition-opacity z-20 bg-background/80 hover:bg-destructive hover:text-destructive-foreground"
+                        className={cn(
+                          "absolute -top-3 -right-3 h-7 w-7 rounded-full transition-opacity z-20 bg-background/80 hover:bg-destructive hover:text-destructive-foreground",
+                          isMobile ? "opacity-100" : "opacity-0 group-hover/card-wrapper:opacity-100"
+                        )}
                         onClick={(e) => {
                             e.stopPropagation();
                             onRemoveFromPhrase(idInPhrase);

@@ -3,6 +3,7 @@ export type PecCard = {
   name: string;
   category: string;
   imageSrc: string;
+  isFavorite?: boolean;
 };
 
 export type PhraseItem =

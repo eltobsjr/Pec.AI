@@ -40,8 +40,8 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-around h-16">
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="flex items-center justify-around h-14 sm:h-16">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -51,15 +51,15 @@ export default function BottomNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 min-w-[64px] h-full transition-colors',
+                  'flex flex-col items-center justify-center gap-0.5 sm:gap-1 min-w-[56px] sm:min-w-[64px] h-full transition-colors',
                   isActive
                     ? 'text-primary'
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                <Icon className={cn('h-5 w-5', isActive && 'scale-110')} />
+                <Icon className={cn('h-5 w-5 sm:h-6 sm:w-6', isActive && 'scale-110')} />
                 <span className={cn(
-                  'text-xs font-medium',
+                  'text-[10px] sm:text-xs font-medium',
                   isActive && 'font-semibold'
                 )}>
                   {item.label}

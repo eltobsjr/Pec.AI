@@ -43,7 +43,14 @@ const identifyObjectPrompt = ai.definePrompt({
   input: {schema: IdentifyObjectAndGenerateCardInputSchema},
   output: {schema: z.object({objectName: z.string(), category: z.string()})},
   prompt: `You are an AI assistant specialized in identifying objects in images and determining their category.
-  Given the image, identify the object and its category. Return the object name and category.
+  Given the image, identify the object and its category.
+  
+  IMPORTANT: You MUST respond in the following language: {{language}}
+  - If language is "pt-BR": respond in Brazilian Portuguese
+  - If language is "en": respond in English
+  - If language is "es": respond in Spanish
+  
+  Return the object name and category in the specified language.
   
   Image: {{media url=photoDataUri}}
   `,
@@ -52,10 +59,11 @@ const identifyObjectPrompt = ai.definePrompt({
 const removeBackgroundAndGenerateCardPrompt = ai.definePrompt({
   name: 'removeBackgroundAndGenerateCardPrompt',
   model: 'googleai/gemini-2.0-flash',
-  input: {schema: z.object({photoDataUri: z.string(), objectName: z.string(), category: z.string()})},
+  input: {schema: z.object({photoDataUri: z.string(), objectName: z.string(), category: z.string(), language: z.string()})},
   output: {schema: z.object({cardDataUri: z.string()})},
   prompt: `You are an AI assistant specialized in removing backgrounds from images and generating visual cards.
   Given the image of an object with the background, remove the background and generate a visual card with the image, object name, and category.
+  The text should be in the language: {{language}}
   Return the card as a data URI.
   
   Object Name: {{{objectName}}}
@@ -81,6 +89,7 @@ const identifyObjectAndGenerateCardFlow = ai.defineFlow(
       photoDataUri: input.photoDataUri,
       objectName: identificationResult.objectName,
       category: identificationResult.category,
+      language: input.language || 'pt-BR',
     });
 
     if (!cardGenerationResult) {

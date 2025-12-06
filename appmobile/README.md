@@ -1,10 +1,10 @@
-# PEC.AI Mobile App
+# PEC.AI Mobile
 
-Aplicativo mobile React Native para PEC.AI - WebView simples do site https://pec-ai.vercel.app
+Aplicativo mobile oficial do **PEC.AI** - Sistema de comunicação alternativa e aumentativa com inteligência artificial.
 
-## 📱 Sobre
+## 📱 Sobre o App
 
-Este é um aplicativo minimalista que exibe o site PEC.AI em uma WebView nativa, sem alterações na responsividade ou funcionalidade do site original.
+Aplicativo React Native (Expo) que funciona como **WebView** do site PEC.AI, permitindo acesso completo às funcionalidades da plataforma diretamente pelo celular com experiência nativa, incluindo permissões para câmera, galeria de fotos e navegação otimizada.
 
 ## 🚀 Tecnologias
 
